@@ -10,7 +10,7 @@ import { useNavigate} from 'react-router-dom'
 
 
 const RoomReservation = ({ roomData }) => {
-  console.log(roomData);
+  // console.log(roomData);
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();

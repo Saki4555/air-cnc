@@ -12,6 +12,7 @@ import {
 } from "firebase/auth";
 import { app } from "../firebase/firebase.config";
 import { getUserRole } from "../api/auth";
+import axios from "axios";
 
 export const AuthContext = createContext(null);
 
@@ -24,11 +25,10 @@ const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if(user){
-      getUserRole(user?.email)
-      .then(data => setRole(data))
+    if (user) {
+      getUserRole(user?.email).then((data) => setRole(data));
     }
-  }, [user])
+  }, [user]);
 
   const createUser = (email, password) => {
     setLoading(true);
@@ -65,8 +65,36 @@ const AuthProvider = ({ children }) => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      console.log("current user", currentUser);
+      // if (currentUser?.email) {
+      //   fetch(`${import.meta.env.VITE_API_URL}/jwt`, {
+      //     method: "POST",
+      //     headers: {
+      //       "content-type": "application/json",
+      //     },
+      //     body: JSON.stringify({ email: currentUser.email }),
+      //   })
+      //     .then((res) => res.json())
+      //     .then((data) => {
+      //       console.log(data.token);
+      //       localStorage.setItem('access-token', data.token)
+      //     });
+      // }
+
+      if(currentUser){
+        axios.post(`${import.meta.env.VITE_API_URL}/jwt`, {
+          email: currentUser?.email,
+        })
+        .then(data => {
+          localStorage.setItem('access-token', data.data.token);
+          setLoading(false);
+        })
+      }
+      else{
+        localStorage.removeItem('access-token');
+      }
       setLoading(false);
+      console.log("current user", currentUser);
+      
     });
     return () => {
       return unsubscribe();

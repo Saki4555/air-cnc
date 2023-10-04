@@ -1,6 +1,11 @@
 import { Dialog, Transition } from "@headlessui/react";
+import { Elements } from "@stripe/react-stripe-js";
 import { format } from "date-fns";
 import { Fragment } from "react";
+import CheckoutForm from "../Forms/CheckoutForm";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(`${import.meta.env.VITE_Payment_Gateway_PK}`);
 
 const BookingModal = ({ 
     modalHandler, 
@@ -67,23 +72,11 @@ const BookingModal = ({
                     Price: $ {bookingInfo.price}
                   </p>
                 </div>
+                <Elements stripe={stripePromise}>
+                  <CheckoutForm closeModal={closeModal} bookingInfo={bookingInfo}></CheckoutForm>
+                </Elements>
                 <hr className="mt-8 " />
-                <div className="flex mt-2 justify-around">
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-red-100 px-4 py-2 text-sm font-medium text-red-900 hover:bg-red-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
-                    onClick={closeModal}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex justify-center rounded-md border border-transparent bg-green-100 px-4 py-2 text-sm font-medium text-green-900 hover:bg-green-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
-                    onClick={modalHandler}
-                  >
-                    Pay {bookingInfo.price}$
-                  </button>
-                </div>
+               
               </Dialog.Panel>
             </Transition.Child>
           </div>
